@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://unpkg.com/react@17/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <title>Hello</title></head>
+
+    <style>
+
+        .challenge-container {
+            text-align: center;
+            font-family:sans-serif;
+            font-size:55px;
+        }
+
+        input {
+            font-size:55px;            
+        }
+        .correct {
+            color:green;
+        }
+
+        .incorrect {
+            color:red;
+        }
+    </style>
+  <body>
+    <div id="app"></div>
+
+
+
+    <script type="text/babel">
+
+
+
+        function App() {
+
+            const [state, setState ] = React.useState({
+                num1: Math.ceil(Math.random() * 10),
+                num2: Math.ceil(Math.random()* 10),
+                response: "",
+                score: 0,
+                status: 1,
+                wrongQuestions: []
+            });
+
+            function updateResponse(event) {
+                setState({
+                    ...state,
+                    response:event.target.value
+                })
+            }
+
+
+            function inputKeyPress(event) {
+                if(event.key === "Enter"){
+                    const answer = parseInt(state.response);
+                    if(answer === state.num1 * state.num2){
+                        setState({
+                            ...state,
+                            score: state.score + 1,
+                            response: "",
+                            num1: Math.ceil(Math.random() * 10),
+                            num2: Math.ceil(Math.random()* 10),
+                            status: true
+                        })
+                    }
+                    else {
+                        setState({
+                            score: state.score - 1,
+                            response: "",
+                            status: false,
+                            wrongQuestions: [...state.wrongQuestions, [state.num1, state.num2]],
+                            num1: Math.ceil(Math.random() * 10),
+                            num2: Math.ceil(Math.random()* 10)
+                        })
+                    }
+                }
+            }
+
+            if(state.score === 2) {
+                let solveWrong = state.wrongQuestions;
+                setState({
+                    ...state,
+                    score:0,
+                    wrongQuestions: []
+                })
+                while(solveWrong.length > 0){
+                    let tempArr = solveWrong.shift();
+
+                    return (
+                        <div className="challenge-container">
+                            <p>Let's solve the mistakes!</p>
+                            <p className={state.status ? "correct" : "incorrect"}>{tempArr[0]} * {tempArr[1]}</p>
+                            <input type="text" className="answer-box" value={state.response} onKeyPress={inputKeyPress} onChange={updateResponse}/>
+                            <p>Score: {state.score}</p>    
+                        </div>
+                    )
+                }
+            } else {
+
+                return (
+                    <div className="challenge-container">
+                        <p className={state.status ? "correct" : "incorrect"}>{state.num1} * {state.num2}</p>
+                        <input type="text" className="answer-box" value={state.response} onKeyPress={inputKeyPress} onChange={updateResponse}/>
+                        <p>Score: {state.score}</p>    
+                    </div>
+                );
+            }
+        }
+
+    
+      
+         ReactDOM.render(<App />, document.querySelector("#app"));
+    
+    </script>
+  </body>
+</html>
